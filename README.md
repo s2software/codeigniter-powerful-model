@@ -1,2 +1,2 @@
-# codeigniter-powerful-model
+# CodeIgniter Powerful Model
 CodeIgniter extension 
