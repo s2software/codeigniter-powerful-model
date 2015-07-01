@@ -8,7 +8,7 @@ The extension also redefine the CI_Loader::model method. If you already have a M
 ## Usage
 
 ### Define a New Entity Object
-In the *Models* folder, create a new *Entities*_model.php defining the *Entities*_model extending MY_Model class (use the plural for the entire table) and the *Entity*_object extending Model_object class (use the singular for the single record).
+In the *Models* folder, create a new *Entities*_model.php file defining the *Entities*_model extending MY_Model class (use the plural for the entire table) and the *Entity*_object extending Model_object class (use the singular for the single record).
 
 See the example with a *cars* table in a *Cars_model.php* file:
 ```php
