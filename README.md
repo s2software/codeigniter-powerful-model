@@ -89,7 +89,7 @@ $id = $new_car->save();	// this produces the insert command
 
 ### Make Some Changes
 ```php
-$edit_car = $this->Cars->get($id);	// this is a "get by id"
+$edit_car = $this->Cars->get($id);
 $edit_car->name = "Change its name";
 $edit_car->save();		// this produces the update command (only for the changed fields, the CI Powerful Model tracks object changes)
 ```
@@ -181,7 +181,7 @@ $this->Cars->flush_cache();
 
 ### Delete
 ```php
-$to_delete = $this->Cars->get($id);	// this is a "get by id"
+$to_delete = $this->Cars->get($id);
 $to_delete->delete();
 ```
 
