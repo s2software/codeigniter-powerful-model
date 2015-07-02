@@ -15,7 +15,7 @@ Let's make examples with a classic *cars* table.
 ### Table schema
 The best practice is to name your table in plural form (eg. `cars`), and name the primary key column as `id`.<br>
 There's no particular preferences for other column names.<br>
-Mind that you can still use other naming conventions for your tables. In this case, it's necessary to set this names by manually set the value of `$this->table` (table name), `$this->row_type` (row object class) and `$this->id_field` (id field name) in the `__construct` of the extended class (see next paragraph).
+Mind that you can still use other naming conventions for your tables. In this case, it's necessary to set this names by manually set the value of `table`, `id_field` and `row_type` properties in the constructor of the entity model definition (see next paragraph).
 
 ### Define a New Entity Object
 In the *Models* folder, create a new *Cars_model.php* file defining the `Cars_model` extending `MY_Model` class (use the plural for the entire table) and the `Car_object` extending `Model_object` class (use the singular for the single record).
@@ -26,6 +26,14 @@ Here the code in *Models/Cars_model.php*:
 
 class Cars_model extends MY_Model {
 	
+	public function __construct()
+	{
+		// If you use standard naming convention, this code can be omitted.
+		/*$this->table = 'cars';
+		$this->id_field = 'id';
+		$this->row_type = 'Car_object';*/
+		parent::__construct();
+	}
 }
 
 class Car_object extends Model_object {
@@ -55,7 +63,7 @@ $some_cars = $this->Cars->where('brand_id', 1)->get_list();
 $a_car = $this->Cars->get(1);	// this is a "get by id"
 ```
 
-### Add a new record
+### Add a New record
 ```php
 $new_car = $this->Cars->new_row();
 $new_car->name = "Powerful Car";
@@ -63,20 +71,20 @@ $new_car->brand_id = 1;
 $id = $new_car->save();	// this produces the insert command
 ```
 
-### Make some changes
+### Make some Changes
 ```php
 $edit_car = $this->Cars->get($id);	// this is a "get by id"
 $edit_car->name = "Change its name";
 $edit_car->save();		// this produces the update command (only for the changed fields, the CI Powerful Model tracks object changes)
 ```
 
-### Automatic join
+### Automatic Join
 ```php
 $all_cars = $this->Cars->autojoin()->get_list();	// automatic LEFT join with the brands table
 // uses the CI's inflector helper to transform <entity>_id to <entities>
 ```
 
-### Manual join
+### Manual Join
 ```php
 $this->Cars->join('brands', 'cars.brand_id = brands.id', 'LEFT');
 $all_cars = $this->Cars->get_list();
@@ -89,14 +97,14 @@ $some_cars = $this->Cars->where_in('brand_id', array(1, 2, 3))->like('name', "%S
 ```
 ### Pagination 
 ```php
-//(page 1, with 10 cars per page)
+// (page 1, with 10 cars per page)
 $cars_page1 = $this->Cars->pagination(1, 10)->order_by('name')->get_list();
 ```
 ### Count
 ```php
 $brand1_cars_count = $this->Cars->where('brand_id', 1)->count();
 ```
-### Automatic get the foreign key object
+### Automatically get a Foreign Key Object
 ```php
 
 $this->load->model('Brands');	// just another CI Power Model object
@@ -105,7 +113,7 @@ $brand = $car->get_brand();	// cars.brand_id => brands.id
 // uses the CI inflector's helper to transform <entity>_id to <entities>.id
 ```
 
-###  Define custom methods
+###  Define Custom Methods
 Here the code in *Models/Cars_model.php*:
 ```php
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
@@ -135,7 +143,7 @@ class Car_object extends Model_object {
 	}
 }
 ```
-#### Usege of the defined custom methods
+#### Usege of the Defined Custom Methods
 ```php
 $cars = $this->Cars->has_brand()->get_list();
 foreach ($cars as $car)
@@ -161,10 +169,10 @@ $to_delete = $this->Cars->get($id);	// this is a "get by id"
 $to_delete->delete();
 ```
 
-### Created/Modified date
+### Created/Modified datetime
 If you add a `created` (datetime) and a `modified` (datetime) field in your table, CI Powerful Model automatically write the creation date and the last change date
 
-### Soft delete support
+### Soft Delete support
 If you create a `deleted` (datetime) field in your table, the delete.<br>
 In this case, to filter your queries excluding the logical deleted records, call the `all` method before. Example:
 ```php
