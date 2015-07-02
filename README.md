@@ -6,11 +6,27 @@ Download the files from this repository and place them into the corresponding fo
 The extension also redefine the `CI_Loader::model` method. If you already have a `MY_Loader` extension, just copy the `MY_Loader::model` extended method within your extended class.
 
 ## Usage
-Let's make some examples with a classic *cars* table.
-<!--
+Let's make some examples with a classic `cars` table.
+- [Table Schema](#table-schema)
 - [Define a New Entity Object](#define-a-new-entity-object)
 - [Load a Model](#load-a-model)
--->
+- [Get All Records](#get-all-records)
+- [Get Some Records](#get-some-records)
+- [Get a Single Record](#get-a-single-record)
+- [Add a New record](#add-a-new-record)
+- [Make Some Changes](#make-some-changes)
+- [Automatic Join](#automatic-join)
+- [Manual Join](#manual-join)
+- [CodeIgniter's Query Builder](#codeigniters-s-Query Builder)
+- [Pagination](#pagination)
+- [Count](#count)
+- [Automatically Get a Foreign Key Object](#automatically-get-a-foreign-key-object)
+- [Define Custom Methods](#define-custom-methods)
+-- [Usege of the Defined Custom Methods](#usege-of-the-defined-custom-methods)
+- [Support for CodeIgniter Query Builder Caching System](#support-for-codeIgniter-query-builder-caching-system)
+- [Delete](#delete)
+- [Created/Modified Datetime](#created-modified-datetime)
+- [Soft Delete Support](#soft-delete-support)
 
 ### Table Schema
 The best practice is to name your table in plural form (eg. `cars`), and name the primary key column as `id`.<br>
@@ -63,7 +79,7 @@ $some_cars = $this->Cars->where('brand_id', 1)->get_list();
 $a_car = $this->Cars->get(1);	// this is a "get by id"
 ```
 
-### Add a New record
+### Add a New Record
 ```php
 $new_car = $this->Cars->new_row();
 $new_car->name = "Powerful Car";
@@ -90,7 +106,7 @@ $this->Cars->join('brands', 'cars.brand_id = brands.id', 'LEFT');
 $all_cars = $this->Cars->get_list();
 ```
 
-### CodeIgniters's Query Builder
+### CodeIgniter's Query Builder
 You can use all the <a href="http://www.codeigniter.com/user_guide/database/query_builder.html" target="_blank">CodeIgniters's Query Builder</a> methods, allowing method chaining.
 ```php
 $some_cars = $this->Cars->where_in('brand_id', array(1, 2, 3))->like('name', "%Something")->order_by('name')->get_list();
