@@ -107,7 +107,7 @@ $brand1_cars_count = $this->Cars->where('brand_id', 1)->count();
 ### Automatically get a Foreign Key Object
 ```php
 
-$this->load->model('Brands');	// just another CI Power Model object
+$this->load->model('Brands');	// just another CI Powerful Model object
 $car = $this->Cars->get(1);
 $brand = $car->get_brand();	// cars.brand_id => brands.id
 // uses the CI inflector's helper to transform <entity>_id to <entities>.id
