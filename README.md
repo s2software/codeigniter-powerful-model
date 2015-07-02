@@ -3,7 +3,7 @@ A CodeIgniter extension to work (or better, to play!) with database tables with 
 
 ## Installation
 Download the files from this repository and place them into the corresponding folders in your CodeIgniter project.<br>
-The extension also redefine the `CI_Loader::model` method. If you already have a `MY_Loader` extension, just copy the `MY_Loader::model` extended method within your extended class.
+The add-in consists of a solid `MY_Model` implementation and also redefines the `CI_Loader::model` method. If you already have a `MY_Loader` extension, just copy the `MY_Loader::model` extended method within your extended class.
 
 ## Usage
 Let's make some examples with a classic `cars` table.
