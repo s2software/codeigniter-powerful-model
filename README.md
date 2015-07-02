@@ -17,7 +17,7 @@ Let's make some examples with a classic `cars` table.
 - [Make Some Changes](#make-some-changes)
 - [Automatic Join](#automatic-join)
 - [Manual Join](#manual-join)
-- [CodeIgniter's Query Builder](#codeigniters-s-Query Builder)
+- [CodeIgniter's Query Builder](#codeigniters-Query Builder)
 - [Pagination](#pagination)
 - [Count](#count)
 - [Automatically Get a Foreign Key Object](#automatically-get-a-foreign-key-object)
@@ -107,7 +107,7 @@ $all_cars = $this->Cars->get_list();
 ```
 
 ### CodeIgniter's Query Builder
-You can use all the <a href="http://www.codeigniter.com/user_guide/database/query_builder.html" target="_blank">CodeIgniters's Query Builder</a> methods, allowing method chaining.
+You can use all the <a href="http://www.codeigniter.com/user_guide/database/query_builder.html" target="_blank">CodeIgniter's Query Builder</a> methods, allowing method chaining.
 ```php
 $some_cars = $this->Cars->where_in('brand_id', array(1, 2, 3))->like('name', "%Something")->order_by('name')->get_list();
 ```
