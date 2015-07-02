@@ -6,13 +6,13 @@ Download the files from this repository and place them into the corresponding fo
 The extension also redefine the `CI_Loader::model` method. If you already have a `MY_Loader` extension, just copy the `MY_Loader::model` extended method within your extended class.
 
 ## Usage
-Let's make examples with a classic *cars* table.
+Let's make some examples with a classic *cars* table.
 <!--
 - [Define a New Entity Object](#define-a-new-entity-object)
 - [Load a Model](#load-a-model)
 -->
 
-### Table schema
+### Table Schema
 The best practice is to name your table in plural form (eg. `cars`), and name the primary key column as `id`.<br>
 There's no particular preferences for other column names.<br>
 Mind that you can still use other naming conventions for your tables. In this case, it's necessary to set this names by manually set the value of `table`, `id_field` and `row_type` properties in the constructor of the entity model definition (see next paragraph).
@@ -47,18 +47,18 @@ $this->load->model('Cars');
 // or autoload like this: $autoload['model'] = array('Cars');
 ```
 
-### Get all records
+### Get All Records
 ```php
 $all_cars = $this->Cars->get_list();
 ```
 
-### Get some records
+### Get Some Records
 ```php
 // Get some records (apply a filter in query)
 $some_cars = $this->Cars->where('brand_id', 1)->get_list();
 ```
 
-### Get a single record
+### Get a Single Record
 ```php
 $a_car = $this->Cars->get(1);	// this is a "get by id"
 ```
@@ -71,7 +71,7 @@ $new_car->brand_id = 1;
 $id = $new_car->save();	// this produces the insert command
 ```
 
-### Make some Changes
+### Make Some Changes
 ```php
 $edit_car = $this->Cars->get($id);	// this is a "get by id"
 $edit_car->name = "Change its name";
@@ -104,7 +104,7 @@ $cars_page1 = $this->Cars->pagination(1, 10)->order_by('name')->get_list();
 ```php
 $brand1_cars_count = $this->Cars->where('brand_id', 1)->count();
 ```
-### Automatically get a Foreign Key Object
+### Automatically Get a Foreign Key Object
 ```php
 
 $this->load->model('Brands');	// just another CI Powerful Model object
@@ -152,7 +152,7 @@ foreach ($cars as $car)
 }
 ```
 
-### Support for CodeIgniter Query Builder Caching system
+### Support for CodeIgniter Query Builder Caching System
 ```php
 $this->Cars->start_cache();
 $this->Cars->where('brand_id', 1);
@@ -169,10 +169,10 @@ $to_delete = $this->Cars->get($id);	// this is a "get by id"
 $to_delete->delete();
 ```
 
-### Created/Modified datetime
+### Created/Modified Datetime
 If you add a `created` (datetime) and a `modified` (datetime) field in your table, CI Powerful Model automatically write the creation date and the last change date
 
-### Soft Delete support
+### Soft Delete Support
 If you create a `deleted` (datetime) field in your table, the delete.<br>
 In this case, to filter your queries excluding the logical deleted records, call the `all` method before. Example:
 ```php
