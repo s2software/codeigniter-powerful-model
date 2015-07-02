@@ -140,7 +140,7 @@ class Cars_model extends MY_Model {
 	{
 		$this->db->where('brand_id >', 0);
 		
-		return $this;	// remember this for method chaining support
+		return $this;	// remember to return $this for method chaining support
 	}
 	
 }
