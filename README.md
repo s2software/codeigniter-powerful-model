@@ -17,7 +17,7 @@ Let's make some examples with a classic `cars` table.
 - [Make Some Changes](#make-some-changes)
 - [Automatic Join](#automatic-join)
 - [Manual Join](#manual-join)
-- [CodeIgniter's Query Builder](#codeigniter-s-Query Builder)
+- [CodeIgniter's Query Builder](#codeigniters-query-builder)
 - [Pagination](#pagination)
 - [Count](#count)
 - [Automatically Get a Foreign Key Object](#automatically-get-a-foreign-key-object)
