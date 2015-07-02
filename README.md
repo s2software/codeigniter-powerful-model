@@ -25,7 +25,7 @@ Let's make some examples with a classic `cars` table.
  - [Usege of the Defined Custom Methods](#usege-of-the-defined-custom-methods)
 - [Support for CodeIgniter Query Builder Caching System](#support-for-codeigniter-query-builder-caching-system)
 - [Delete](#delete)
-- [Created/Modified Datetime](#created-modified-datetime)
+- [Created/Modified Datetime](#createdmodified-datetime)
 - [Soft Delete Support](#soft-delete-support)
 
 ### Table Schema
