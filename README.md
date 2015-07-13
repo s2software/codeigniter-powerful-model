@@ -60,7 +60,7 @@ class Car_object extends Model_object {
 ### Load a Model
 ```php
 $this->load->model('Cars');
-// or autoload like this: $autoload['model'] = array('Cars');
+// or autoload in CI's application/config/autoload.php like this: $autoload['model'] = array('Cars');
 ```
 
 ### Get All Records
