@@ -189,7 +189,7 @@ $to_delete->delete();
 If you add a `created` (datetime) and a `modified` (datetime) field in your table, CI Powerful Model automatically write the creation date and the last change date
 
 ### Soft Delete Support
-If you create a `deleted` (datetime) field in your table, the delete.<br>
+If you add a `deleted` (datetime) field in your table, the `delete` function doesn't hard delete the record, but writes the delete datetime in this field.<br>
 In this case, to filter your queries excluding the logical deleted records, call the `all` method before. Example:
 ```php
 $all_cars = $this->Cars->all()->get_list();
