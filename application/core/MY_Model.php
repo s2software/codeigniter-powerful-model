@@ -1,7 +1,16 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * s2s base model v. 3.0.0
+ * CodeIgniter Powerful Model
+ *
+ * A CodeIgniter extension to work (or better, to play!) with database tables
+ * with an easy and intuitive Object Oriented / Entity Framework approach.
+ *
+ * @author	Storti Stefano
+ * @copyright	Copyright (c) 2015, S2 Software di Storti Stefano
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	http://www.s2software.it
+ * @version 3.0.1
  */
 class MY_Model extends CI_Model {
 	
@@ -98,6 +107,10 @@ class MY_Model extends CI_Model {
 	 */
 	public function all($deleted = FALSE)
 	{
+		$table_fields = $this->db->list_fields($this->table);
+		if (!in_array('deleted', $table_fields))
+			return $this;
+		
 		if ($deleted !== NULL)
 		{
 			$this->where($this->table.'.deleted'.($deleted ? ' !=' : ''), MYSQL_EMPTYDATETIME);
