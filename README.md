@@ -1,5 +1,5 @@
 # CodeIgniter Powerful Model
-A CodeIgniter extension to work (or better, to play!) with database tables with an easy and intuitive Object Oriented / Entity Framework approach.
+A CodeIgniter extension to work with database tables with an easy and intuitive Object Oriented / Entity Framework approach.
 
 ## Installation
 Download the files from this repository and place them into the corresponding folders in your CodeIgniter project.<br>
