@@ -10,7 +10,7 @@
  * @copyright	Copyright (c) 2015, S2 Software di Storti Stefano
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	http://www.s2software.it
- * @version 3.0.1
+ * @version 3.2.2
  */
 class MY_Model extends CI_Model {
 	
@@ -26,6 +26,9 @@ class MY_Model extends CI_Model {
 	
 	protected $_call_autojoin = FALSE;
 	protected $_cache_call_autojoin = FALSE;
+	
+	protected $_joined_tables = array();
+	protected $_cache_joined_tables = array();
 	
 	public function __construct()
 	{
@@ -86,6 +89,7 @@ class MY_Model extends CI_Model {
 		{
 			$this->_cache_native_calls = array();
 			$this->_cache_call_autojoin = FALSE;
+			$this->_cache_joined_tables = array();
 		}
 		elseif ($name == 'reset_query')
 		{
@@ -96,6 +100,15 @@ class MY_Model extends CI_Model {
 			$this->_native_calls[] = $name;
 			if ($this->_is_caching)
 				$this->_cache_native_calls[] = $name;
+			
+			// Keep in mind already joined table to avoid rejoins in the method chaining pattern
+			// (the extended model can call the is_joined() function to check it this table is already joined)
+			if ($name == 'join')
+			{
+				$this->_joined_tables[] = $arguments[0];
+				if ($this->_is_caching)
+					$this->_cache_joined_tables[] = $arguments[0];
+			}
 		}
 		return $this;
 	}
@@ -121,10 +134,10 @@ class MY_Model extends CI_Model {
 	/**
 	 * Pagination with method chaining
 	 */
-	public function pagination($page, $pagesize)
+	public function pagination($page, $pagesize, $check_more = FALSE)
 	{
 		if ($page > 0 && $pagesize > 0)
-			$this->db->limit($pagesize, $pagesize*($page-1));
+			$this->db->limit($pagesize + ($check_more ? 1 : 0), $pagesize*($page-1));
 		return $this;
 	}
 	
@@ -359,7 +372,7 @@ class MY_Model extends CI_Model {
 		if (is_numeric($filter))
 			$filter = array($id_field => $filter);
 		
-		if (!is_array($filter))
+		if (!is_array($filter) && !is_string($filter))
 			return;
 		
 		$this->db->trans_start();
@@ -415,6 +428,15 @@ class MY_Model extends CI_Model {
 		}
 		
 		return $row;
+	}
+	
+	/**
+	 * Check if table is already joind in the current query building
+	 * @param string $table
+	 */
+	public function is_joined($table)
+	{
+		return in_array($table, $this->_joined_tables) || in_array($table, $this->_cache_joined_tables);
 	}
 	
 	/**
@@ -559,6 +581,7 @@ class MY_Model extends CI_Model {
 	{
 		$this->_native_calls = array();
 		$this->_call_autojoin = FALSE;
+		$this->_joined_tables = array();
 	}
 	
 	/*
@@ -574,6 +597,7 @@ class Model_object {
 	
 	protected $_model = '';	// protected to be skipped while listing db fields
 	protected $_old = array();	// old values (track changes for safe update)
+	protected $_force_changes = FALSE;	// force all fields to the changed status
 	
 	public function __construct()
 	{
@@ -629,7 +653,7 @@ class Model_object {
 		{
 			$fname = $field->name;
 			if ($field->primary_key)
-				$pk[$fname] = $this->$fname;
+				$pk[$fname] = isset($this->$fname) ? $this->$fname : 0;
 		}
 		
 		return $pk;
@@ -672,7 +696,7 @@ class Model_object {
 		foreach ($reflect->getProperties(ReflectionProperty::IS_PUBLIC) as $prop)
 		{
 			$key = $prop->getName();
-			if (isset($this->_old[$key]) && $this->$key !== $this->_old[$key])
+			if (isset($this->_old[$key]) && $this->$key !== $this->_old[$key] || $this->_force_changes)
 				$changes[$key] = $this->$key;
 		}
 		
@@ -704,6 +728,15 @@ class Model_object {
 	}
 	
 	/**
+	 * Force all fields to the changed status
+	 * @param bool $force
+	 */
+	public function force_changes($force = TRUE)
+	{
+		$this->_force_changes = $force;
+	}
+	
+	/**
 	 * Shortcut to parent model save function
 	 */
 	public function save()
@@ -717,6 +750,7 @@ class Model_object {
 	
 	/**
 	 * Shortcut to parent model delete function
+	 * @param bool $soft
 	 */
 	public function delete($soft = NULL)
 	{
