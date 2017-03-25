@@ -10,7 +10,7 @@
  * @copyright	Copyright (c) 2015, S2 Software di Storti Stefano
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	http://www.s2software.it
- * @version 3.2.2
+ * @version 3.2.3
  */
 class MY_Model extends CI_Model {
 	
@@ -417,7 +417,7 @@ class MY_Model extends CI_Model {
 		foreach ($fields as $field)
 		{
 			$name = $field->name;
-			if (in_array($field->type, array('int', 'decimal', 'double', 'float')))
+			if (in_array($field->type, array('int', 'decimal', 'double', 'float', 'tinyint')))
 				$row->$name = 0;
 			elseif ($field->type == 'datetime')
 				$row->$name = MYSQL_EMPTYDATETIME;
