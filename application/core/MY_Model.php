@@ -7,10 +7,10 @@
  * with an easy and intuitive Object Oriented / Entity Framework approach.
  *
  * @author	Storti Stefano
- * @copyright	Copyright (c) 2015, S2 Software di Storti Stefano
+ * @copyright	Copyright (c) 2019, S2 Software di Storti Stefano
  * @license	http://opensource.org/licenses/MIT	MIT License
  * @link	http://www.s2software.it
- * @version 3.2.3
+ * @version 3.6.1
  */
 class MY_Model extends CI_Model {
 	
@@ -29,6 +29,9 @@ class MY_Model extends CI_Model {
 	
 	protected $_joined_tables = array();
 	protected $_cache_joined_tables = array();
+	
+	protected $_table_fields = NULL;
+	protected $_field_data = NULL;
 	
 	public function __construct()
 	{
@@ -52,20 +55,10 @@ class MY_Model extends CI_Model {
 		if (!$this->id_field)
 		{
 			$this->id_field = 'id';
-			if ($this->db->table_exists($this->table))
-			{
-				$fields = $this->db->field_data($this->table);
-				foreach ($fields as $field)
-				{
-					$fname = $field->name;
-					if ($field->primary_key)
-					{
-						$this->id_field = $fname;
-						break;
-					}
-				}
-			}
 		}
+		
+		// (avoid possible unnecessary queries on db scherma here to initialize the model:
+		// i will initialize _table_fields and _field_data at the moment i need them)
 	}
 	
 	/**
@@ -114,13 +107,50 @@ class MY_Model extends CI_Model {
 	}
 	
 	/**
+	 * Refresh the _table_fields and _field_data vars
+	 */
+	public function fetch_table_fields()
+	{
+		$this->table_fields(TRUE);
+		$this->field_data(TRUE);
+	}
+	
+	/**
+	 * @param boolean $refresh
+	 * @return array
+	 */
+	public function table_fields($refresh = FALSE)
+	{
+		if ($this->_table_fields == NULL || $refresh)
+		{
+			if (isset($this->db->data_cache['field_names'][$this->table])) // reset cached array in CI db driver
+				$this->db->data_cache['field_names'][$this->table] = NULL;
+			$this->_table_fields = $this->db->list_fields($this->table);
+		}
+		return $this->_table_fields;
+	}
+	
+	/**
+	 * @param boolean $refresh
+	 * @return array
+	 */
+	public function field_data($refresh = FALSE)
+	{
+		if ($this->_field_data == NULL || $refresh)
+		{
+			$this->_field_data = $this->db->field_data($this->table);
+		}
+		return $this->_field_data;
+	}
+	
+	/**
 	 * If this table supports soft delete, this filter need to be applied
 	 * to return only the logically not deleted record
 	 * @param bool $deleted (NULL = include soft deleted records / FALSE = exclude soft deleted records / TRUE = get only soft deleted records)
 	 */
 	public function all($deleted = FALSE)
 	{
-		$table_fields = $this->db->list_fields($this->table);
+		$table_fields = $this->table_fields();
 		if (!in_array('deleted', $table_fields))
 			return $this;
 		
@@ -149,8 +179,6 @@ class MY_Model extends CI_Model {
 		$this->_call_autojoin = TRUE;
 		return $this;
 	}
-	
-	
 	
 	/**
 	 * Get an array of rows
@@ -308,7 +336,7 @@ class MY_Model extends CI_Model {
 		$id_field = $this->id_field;
 		
 		// keep only effective table fields
-		$table_fields = $this->db->list_fields($this->table);
+		$table_fields = $this->table_fields();
 		foreach ($row as $field => $value)
 		{
 			if (!in_array($field, $table_fields))
@@ -380,7 +408,7 @@ class MY_Model extends CI_Model {
 		// soft delete mode automatically detected
 		if ($soft === NULL)
 		{
-			$table_fields = $this->db->list_fields($this->table);
+			$table_fields = $this->table_fields();
 			$soft = in_array('deleted', $table_fields);
 		}
 		
@@ -413,11 +441,11 @@ class MY_Model extends CI_Model {
 	public function new_row()
 	{
 		$row = new $this->row_type();
-		$fields = $this->db->field_data($this->table);
+		$fields = $this->field_data();
 		foreach ($fields as $field)
 		{
 			$name = $field->name;
-			if (in_array($field->type, array('int', 'decimal', 'double', 'float', 'tinyint')))
+			if (in_array($field->type, array('int', 'decimal', 'double', 'float', 'tinyint', 'smallint')))
 				$row->$name = 0;
 			elseif ($field->type == 'datetime')
 				$row->$name = MYSQL_EMPTYDATETIME;
@@ -461,7 +489,8 @@ class MY_Model extends CI_Model {
 		foreach ($tables as $table)
 		{
 			$entity = entity($table);
-			$this->db->join($table, "$this->table.{$entity}_id = $table.id", 'LEFT');
+			if (!$this->is_joined($table))
+				$this->join($table, "$this->table.{$entity}_id = $table.id", 'left');
 		}
 	}
 	protected function _autojoin_fields($reverse = FALSE, &$filters = array())
@@ -509,7 +538,7 @@ class MY_Model extends CI_Model {
 	private function _autojoin_tables()
 	{
 		$tables = array();
-		$fields = $this->db->list_fields($this->table);
+		$fields = $this->table_fields();
 		foreach ($fields as $field)
 		{
 			if (substr($field, -3) == '_id')
@@ -534,7 +563,7 @@ class MY_Model extends CI_Model {
 	{
 		$id_field = $this->id_field;
 		
-		$field_data = $this->db->field_data($this->table);
+		$field_data = $this->field_data();
 		foreach ($this->_autojoin_tables() as $table)	// consider also auto join fields
 		{
 			$autojoin_fields = $this->db->field_data($table);
@@ -613,7 +642,10 @@ class Model_object {
 	{
 		// field initialization (implement safe update support)
 		$this->$name = $value;
-		if (!isset($this->_old[$name])) $this->_old[$name] = $value;
+		//if (!isset($this->_old[$name])) $this->_old[$name] = $value;
+		// use array_key_exists instead of isset: the db value could be null
+		if (!array_key_exists($name, $this->_old))
+			$this->_old[$name] = $value;
 	}
 	
 	public function __call($name, $arguments)
@@ -645,10 +677,9 @@ class Model_object {
 		/* @var $CI MY_Controller */
 		$CI = &get_instance();
 		$model = $this->_model;
-		$table = $CI->$model->table;
 		
 		$pk = array();
-		$fields = $CI->db->field_data($table);
+		$fields = $CI->$model->field_data();
 		foreach ($fields as $field)
 		{
 			$fname = $field->name;
@@ -696,7 +727,9 @@ class Model_object {
 		foreach ($reflect->getProperties(ReflectionProperty::IS_PUBLIC) as $prop)
 		{
 			$key = $prop->getName();
-			if (isset($this->_old[$key]) && $this->$key !== $this->_old[$key] || $this->_force_changes)
+			//if (isset($this->_old[$key]) && $this->$key !== $this->_old[$key] || $this->_force_changes)
+			// (use array_key_exists instead of isset: the db value could be null)
+			if (array_key_exists($key, $this->_old) && $this->$key !== $this->_old[$key] || $this->_force_changes)
 				$changes[$key] = $this->$key;
 		}
 		
@@ -746,6 +779,21 @@ class Model_object {
 		$model = $this->_model;
 		
 		return $CI->$model->save($this);
+	}
+	
+	/**
+	 * Return an associative array with only the public fields
+	 */
+	public function public_vars()
+	{
+		$vars = array();
+		$reflect = new ReflectionObject($this);	// loop only public properties (db fields)
+		foreach ($reflect->getProperties(ReflectionProperty::IS_PUBLIC) as $prop)
+		{
+			$key = $prop->getName();
+			$vars[$key] = $this->$key;
+		}
+		return $vars;
 	}
 	
 	/**
